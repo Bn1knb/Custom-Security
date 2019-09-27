@@ -9,7 +9,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 @WebFilter("/*")
-@Order(2)
+@Order(1)
 public class LoginFilter implements Filter {
     private static final String LOGIN_PAGE_URI = "/login";
     private static final String REGISTRATION_PAGE_URI = "/register";

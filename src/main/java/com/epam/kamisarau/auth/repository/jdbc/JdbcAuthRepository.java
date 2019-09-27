@@ -5,6 +5,7 @@ import com.epam.kamisarau.auth.exception.NoTokenFound;
 import com.epam.kamisarau.auth.exception.NoUserFound;
 import com.epam.kamisarau.auth.repository.AuthRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Repository;

@@ -11,18 +11,22 @@ import java.util.Date;
 @Accessors(chain = true)
 @NoArgsConstructor
 @Entity
+@Table(name = "USER_STORAGE")
 public class UserModel {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
+    //@Column(unique = true)
     private String username;
     private String password;
     private Date registeredAt;
     private String name;
     private String surname;
     private boolean isActive;
-    @JoinTable(name = "user_role", joinColumns = @JoinColumn(name = "user_name"), inverseJoinColumns = @JoinColumn(name = "role_id"))
+    @OneToOne
+    @JoinColumn
     private RoleModel role;
-    @JoinTable(name = "user_token", joinColumns = @JoinColumn(name = "user_name"), inverseJoinColumns = @JoinColumn(name = "token_id"))
+    @OneToOne(cascade = CascadeType.REMOVE)
+    @JoinColumn
     private TokenModel token;
 }

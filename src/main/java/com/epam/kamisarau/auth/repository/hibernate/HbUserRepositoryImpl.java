@@ -29,7 +29,7 @@ public class HbUserRepositoryImpl implements UserRepository {
             transaction = session.beginTransaction();
 
             user = Optional.of(
-                    session.load(UserModel.class, userId)
+                    (UserModel) session.createQuery("FROM user_storage u WHERE u.id = " + userId).getSingleResult()
             );
 
             transaction.commit();
@@ -51,7 +51,7 @@ public class HbUserRepositoryImpl implements UserRepository {
             transaction = session.beginTransaction();
 
             user = Optional.of(
-                    (UserModel) session.createQuery("", UserModel.class)
+                    (UserModel) session.createQuery("FROM user_storage u WHERE u.username = " + username).getSingleResult()
             );
 
             transaction.commit();
@@ -66,12 +66,13 @@ public class HbUserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public UserModel doRegister(UserModel user) throws RegistrationFailedException {
+    public UserModel register(UserModel user) throws RegistrationFailedException {
         UserModel registeredUser;
+        Long userId = null;
 
         try (Session session = sessionFactory.openSession()) {
             transaction = session.beginTransaction();
-            session.save(user);
+            userId = (Long) session.save(user);
             transaction.commit();
         } catch (Exception e) {
             if (transaction != null) {
@@ -82,11 +83,32 @@ public class HbUserRepositoryImpl implements UserRepository {
         }
 
         try {
-            registeredUser = getUserByUsername(user.getUsername());
+            registeredUser = getUser(userId);
         } catch (NoUserFound e) {
             throw new RegistrationFailedException();
         }
 
         return registeredUser;
+    }
+
+    public UserModel getUserByTokenId(Long tokenId) throws NoUserFound {
+        Optional<UserModel> user = Optional.empty();
+
+        try (Session session = sessionFactory.openSession()) {
+            transaction = session.beginTransaction();
+
+            user = Optional.of(
+                    (UserModel) session.createQuery("FROM user_storage u WHERE u.token.id = " + tokenId).getSingleResult()
+            );
+
+            transaction.commit();
+        } catch (Exception e) {
+
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            e.printStackTrace();
+        }
+        return user.orElseThrow(NoUserFound::new);
     }
 }

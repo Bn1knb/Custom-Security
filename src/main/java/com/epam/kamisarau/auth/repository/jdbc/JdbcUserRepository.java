@@ -44,6 +44,11 @@ public class JdbcUserRepository implements UserRepository {
     }
 
     @Override
+    public UserModel getUserByTokenId(Long tokenId) {
+        return null;
+    }
+
+    @Override
     public UserModel getUser(Long userId) {
         Optional<UserModel> user = Optional.empty();
         try {
@@ -108,7 +113,7 @@ public class JdbcUserRepository implements UserRepository {
     }
 
     @Override
-    public UserModel doRegister(UserModel user) {
+    public UserModel register(UserModel user) {
         Optional<UserModel> registeredUser;
         Timestamp timestamp = new Timestamp(user.getRegisteredAt().getTime());
 

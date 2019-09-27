@@ -1,4 +1,4 @@
-package com.epam.kamisarau.auth.service.impl;
+package com.epam.kamisarau.auth.service.impl.jdbc;
 
 import com.epam.kamisarau.auth.exception.NoTokenFound;
 import com.epam.kamisarau.auth.model.TokenModel;
@@ -7,7 +7,10 @@ import com.epam.kamisarau.auth.model.dto.TokenValueDto;
 import com.epam.kamisarau.auth.repository.AuthRepository;
 import com.epam.kamisarau.auth.repository.TokenRepository;
 import com.epam.kamisarau.auth.repository.UserRepository;
+import com.epam.kamisarau.auth.repository.jdbc.JdbcUserRepository;
 import com.epam.kamisarau.auth.service.AuthService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.util.Calendar;
@@ -20,7 +23,8 @@ public class AuthServiceImpl implements AuthService {
     private AuthRepository authRepository;
     private UserRepository userRepository;
 
-    public AuthServiceImpl(TokenRepository tokenRepository, AuthRepository authRepository, UserRepository userRepository) {
+    @Autowired
+    public AuthServiceImpl(@Qualifier("jdbcTokenRepository") TokenRepository tokenRepository, AuthRepository authRepository, @Qualifier("jdbcUserRepository") UserRepository userRepository) {
         this.tokenRepository = tokenRepository;
         this.authRepository = authRepository;
         this.userRepository = userRepository;

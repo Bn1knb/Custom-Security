@@ -12,7 +12,7 @@ import org.springframework.web.servlet.view.InternalResourceViewResolver;
 
 @Configuration
 @EnableWebMvc
-@ComponentScan(basePackages = "com.epam.kamisarau.auth"/*, excludeFilters = @ComponentScan.Filter(type = FilterType.REGEX, pattern="${}")*/) //TODO profiles and exclude jdbc or hibernate
+@ComponentScan(basePackages = "com.epam.kamisarau.auth")
 public class MvcConfig implements WebMvcConfigurer {
     @Override
     public void configureDefaultServletHandling(DefaultServletHandlerConfigurer configurer) {

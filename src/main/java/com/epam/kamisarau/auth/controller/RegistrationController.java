@@ -7,6 +7,7 @@ import com.epam.kamisarau.auth.model.dto.UserRegistrationDto;
 import com.epam.kamisarau.auth.service.AuthService;
 import com.epam.kamisarau.auth.service.UserAuthService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -22,7 +23,7 @@ public class RegistrationController {
     private AuthService authService;
 
     @Autowired
-    public RegistrationController(UserAuthService userAuthService, AuthService authService) {
+    public RegistrationController(@Qualifier("hbUserService") UserAuthService userAuthService, @Qualifier("hbAuthService") AuthService authService) {
         this.userAuthService = userAuthService;
         this.authService = authService;
     }

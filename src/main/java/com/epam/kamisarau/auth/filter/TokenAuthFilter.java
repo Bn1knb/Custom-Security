@@ -4,7 +4,7 @@ import com.epam.kamisarau.auth.exception.NoTokenFound;
 import com.epam.kamisarau.auth.model.TokenModel;
 import com.epam.kamisarau.auth.model.UserModel;
 import com.epam.kamisarau.auth.service.AuthService;
-import com.epam.kamisarau.auth.service.impl.AuthServiceImpl;
+import com.epam.kamisarau.auth.service.impl.jdbc.AuthServiceImpl;
 import org.springframework.core.annotation.Order;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
@@ -17,7 +17,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 @WebFilter("/*")
-@Order(1)
+@Order(2)
 public class TokenAuthFilter implements Filter {
     private TokenModel token;
     private AuthService authService;

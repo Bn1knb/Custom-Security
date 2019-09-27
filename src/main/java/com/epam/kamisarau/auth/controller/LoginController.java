@@ -8,6 +8,7 @@ import com.epam.kamisarau.auth.model.dto.UserCredsDto;
 import com.epam.kamisarau.auth.service.AuthService;
 import com.epam.kamisarau.auth.service.UserAuthService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -24,7 +25,7 @@ public class LoginController {
     private static final String USER_ATTRIBUTE_NAME = "user";
 
     @Autowired
-    public LoginController(UserAuthService userAuthService, AuthService authService) {
+    public LoginController(@Qualifier("hbUserService") UserAuthService userAuthService, @Qualifier("hbAuthService") AuthService authService) {
         this.userAuthService = userAuthService;
         this.authService = authService;
     }
