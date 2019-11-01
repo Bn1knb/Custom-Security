@@ -5,6 +5,6 @@ import com.epam.kamisarau.auth.model.dto.UserCredsDto;
 import com.epam.kamisarau.auth.model.dto.UserRegistrationDto;
 
 public interface UserAuthService {
-    UserModel register(UserRegistrationDto userRegistrationDto);
+    UserModel register(UserModel userModel);
     UserModel login(UserCredsDto userCredsDto);
 }

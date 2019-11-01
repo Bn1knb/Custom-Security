@@ -1,58 +1,50 @@
 package com.epam.kamisarau.auth.config;
 
-import com.epam.kamisarau.auth.model.RoleModel;
-import com.epam.kamisarau.auth.model.TokenModel;
-import com.epam.kamisarau.auth.model.UserModel;
-import org.hibernate.SessionFactory;
-import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Environment;
-import org.hibernate.service.ServiceRegistry;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.orm.jpa.JpaTransactionManager;
+import org.springframework.orm.jpa.LocalEntityManagerFactoryBean;
+import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import java.util.Properties;
 
 @Configuration
+@EnableTransactionManagement
 @PropertySource(value = "classpath:hb.properties")
 public class HibernateConfig {
-    @Value("${mysql.driver}")
-    private String driver;
-    @Value("${mysql.url}")
-    private String url;
-    @Value("${mysql.user}")
-    private String user;
-    @Value("${mysql.password}")
-    private String password;
-    @Value("${mysql.dialect}")
-    private String dialect;
     @Value("${mysql.show.sql}")
     private String showSql;
-    @Value("${mysql.ddl-auto}")
-    private String ddlAuto;
+    @Value("${mysql.current.session.context}")
+    private String contextClass;
 
-    @Bean(name = "HbSessionFactory")
-    SessionFactory getSessionFactory() {
-        org.hibernate.cfg.Configuration configuration = new org.hibernate.cfg.Configuration();
-        configuration.setProperties(getProperties());
-        configuration.addAnnotatedClass(RoleModel.class);
-        configuration.addAnnotatedClass(UserModel.class);
-        configuration.addAnnotatedClass(TokenModel.class);
-        ServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder()
-                .applySettings(configuration.getProperties()).build();
-        return configuration.buildSessionFactory(serviceRegistry);
+    @Bean
+    public LocalEntityManagerFactoryBean entityManagerFactoryBean() {
+
+        LocalEntityManagerFactoryBean localEntityManagerFactoryBean = new LocalEntityManagerFactoryBean();
+        localEntityManagerFactoryBean.setPersistenceUnitName("persistence");
+
+        HibernateJpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
+        localEntityManagerFactoryBean.setJpaVendorAdapter(vendorAdapter);
+
+        localEntityManagerFactoryBean.setJpaProperties(getProperties());
+
+        return localEntityManagerFactoryBean;
+    }
+
+    @Bean
+    public JpaTransactionManager jpaTransMan(){
+        return new JpaTransactionManager(
+                entityManagerFactoryBean().getObject());
     }
 
     private Properties getProperties() {
         Properties settings = new Properties();
-        settings.put(Environment.DRIVER, driver);
-        settings.put(Environment.URL, url);
-        settings.put(Environment.USER, user);
-        settings.put(Environment.PASS, password);
-        settings.put(Environment.DIALECT, dialect);
         settings.put(Environment.SHOW_SQL, showSql);
-        settings.put(Environment.HBM2DDL_AUTO, ddlAuto);
+        settings.put(Environment.CURRENT_SESSION_CONTEXT_CLASS, contextClass);
 
         return settings;
     }

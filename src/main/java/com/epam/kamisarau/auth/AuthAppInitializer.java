@@ -11,6 +11,7 @@ import javax.servlet.ServletRegistration;
 
 public class AuthAppInitializer implements WebApplicationInitializer {
     private static final String DISPATCHER_SERVLET_NAME = "SpringDispatcher";
+
     @Override
     public void onStartup(ServletContext servletContext) {
         AnnotationConfigWebApplicationContext context = new AnnotationConfigWebApplicationContext();

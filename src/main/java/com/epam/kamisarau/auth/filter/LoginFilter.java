@@ -1,7 +1,5 @@
 package com.epam.kamisarau.auth.filter;
 
-import org.springframework.core.annotation.Order;
-
 import javax.servlet.*;
 import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
@@ -9,12 +7,10 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 @WebFilter("/*")
-@Order(2)
 public class LoginFilter implements Filter {
     private static final String LOGIN_PAGE_URI = "/login";
     private static final String REGISTRATION_PAGE_URI = "/register";
-    private static final String USER_PAGE_URI = "/user";
-    private static final String USER_ATTRIBUTE_NAME = "user";
+    private static final String SWAGGER_PATTERN = "/swagger";
 
     @Override
     public void doFilter(ServletRequest servletRequest,
@@ -23,30 +19,21 @@ public class LoginFilter implements Filter {
 
         HttpServletRequest request = (HttpServletRequest) servletRequest;
         HttpServletResponse response = (HttpServletResponse) servletResponse;
+        String uri = request.getRequestURI().substring(5);
 
         boolean isLoginRequest = (request.getContextPath() + LOGIN_PAGE_URI).equals(request.getRequestURI());
         boolean isRegisterRequest = (request.getContextPath() + REGISTRATION_PAGE_URI).equals(request.getRequestURI());
-        boolean loggedIn = request.getSession() != null && request.getSession().getAttribute(USER_ATTRIBUTE_NAME) != null;
+        boolean isSwaggerRequest = uri.startsWith(SWAGGER_PATTERN) || uri.startsWith("/v2/api-docs") || uri.startsWith("/webjars/springfox");
 
-        if (loggedIn) {
-
-            if (isRegisterRequest || isLoginRequest) {
-                response.sendRedirect(request.getContextPath() + USER_PAGE_URI);
-            } else {
-                filterChain.doFilter(request, response);
-            }
-
+        if (isRegisterRequest || isLoginRequest || isSwaggerRequest) {
+            filterChain.doFilter(request, response);
         } else {
-            if (isRegisterRequest || isLoginRequest) {
-                filterChain.doFilter(request, response);
-            } else {
-                response.sendRedirect(request.getContextPath() + LOGIN_PAGE_URI);
-            }
+            response.sendRedirect("http://localhost:80/proxy/auth" + LOGIN_PAGE_URI);
         }
     }
 
     @Override
-    public void init(FilterConfig filterConfig) throws ServletException {
+    public void init(FilterConfig filterConfig) {
 
     }
 
