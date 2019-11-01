@@ -1,0 +1,2 @@
+INSERT INTO token_storage(id, token_value) SELECT 1, 'ecPV30LmPx8=QURNSU4=' WHERE NOT EXISTS (SELECT * FROM token_storage WHERE id=1);
+INSERT INTO user (username, password, role, state, first_name, last_name, token_id) SELECT 'ADMIN', '$2a$10$RUS6xbILayAmax/t6x0hMuV5UR/5kfRvgGaVQnTGmdGbN1tsx1CDa', 'ROLE_ADMIN', 'ACTIVE', 'ADMIN', 'ADMIN', 1 WHERE NOT EXISTS (SELECT * FROM user WHERE username='ADMIN');
