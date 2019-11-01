@@ -7,4 +7,5 @@ public interface UserRepository {
     UserModel getUser(Long userId);
     UserModel getUserByUsername(String username);
     UserModel register(UserModel user);
+    UserModel updateUser(UserModel user);
 }

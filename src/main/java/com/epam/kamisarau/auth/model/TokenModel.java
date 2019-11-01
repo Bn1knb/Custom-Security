@@ -14,8 +14,10 @@ import java.util.Date;
 @Table(name = "TOKEN_STORAGE")
 public class TokenModel {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private Long tokenValue;
+    @Column(name = "token_value")
+    private String tokenValue;
+    @Column(name = "expiration_date")
     private Date expirationDate;
 }

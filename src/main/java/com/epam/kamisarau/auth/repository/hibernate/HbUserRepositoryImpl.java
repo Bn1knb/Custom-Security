@@ -4,110 +4,93 @@ import com.epam.kamisarau.auth.exception.NoUserFound;
 import com.epam.kamisarau.auth.exception.RegistrationFailedException;
 import com.epam.kamisarau.auth.model.UserModel;
 import com.epam.kamisarau.auth.repository.UserRepository;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 import java.util.Optional;
 
 @Repository
+@RequiredArgsConstructor
 public class HbUserRepositoryImpl implements UserRepository {
-    private SessionFactory sessionFactory;
-    private Transaction transaction;
-
-    @Autowired
-    public HbUserRepositoryImpl(SessionFactory sessionFactory) {
-        this.sessionFactory = sessionFactory;
-    }
+    @PersistenceContext
+    private EntityManager entityManager;
 
     @Override
-    public UserModel getUser(Long userId) {
-        Optional<UserModel> user = Optional.empty();
-        try (Session session = sessionFactory.openSession()) {
-            transaction = session.beginTransaction();
+    public UserModel getUser(Long userId) throws NoUserFound {
+        Optional<UserModel> user;
 
+        try {
+            Query query = entityManager.createQuery("FROM UserModel WHERE id = :id");
             user = Optional.of(
-                    (UserModel) session.createQuery("FROM user_storage u WHERE u.id = " + userId).getSingleResult()
+                    (UserModel) query.setParameter("id", userId).getSingleResult()
             );
-
-            transaction.commit();
-        } catch (Exception e) {
-
-            if (transaction != null) {
-                transaction.rollback();
-            }
+        } catch (Throwable e) {
             e.printStackTrace();
+            throw new NoUserFound();
         }
+
         return user.orElseThrow(NoUserFound::new);
     }
 
     @Override
     public UserModel getUserByUsername(String username) throws NoUserFound {
-        Optional<UserModel> user = Optional.empty();
+        Optional<UserModel> user;
 
-        try (Session session = sessionFactory.openSession()) {
-            transaction = session.beginTransaction();
-
+        try {
+            Query query = entityManager.createQuery("FROM UserModel WHERE username = :username");
             user = Optional.of(
-                    (UserModel) session.createQuery("FROM user_storage u WHERE u.username = " + username).getSingleResult()
+                    (UserModel) query.setParameter("username", username).getSingleResult()
             );
-
-            transaction.commit();
-        } catch (Exception e) {
-
-            if (transaction != null) {
-                transaction.rollback();
-            }
+        } catch (Throwable e) {
             e.printStackTrace();
+            throw new NoUserFound();
         }
         return user.orElseThrow(NoUserFound::new);
     }
 
+
     @Override
+    @Transactional(propagation = Propagation.MANDATORY)
     public UserModel register(UserModel user) throws RegistrationFailedException {
-        UserModel registeredUser;
-        Long userId = null;
-
-        try (Session session = sessionFactory.openSession()) {
-            transaction = session.beginTransaction();
-            userId = (Long) session.save(user);
-            transaction.commit();
-        } catch (Exception e) {
-            if (transaction != null) {
-                transaction.rollback();
-            }
-
-            e.printStackTrace();
-        }
-
+        UserModel mergedUser;
         try {
-            registeredUser = getUser(userId);
-        } catch (NoUserFound e) {
+            //TODO resolve problem
+            mergedUser = entityManager.merge(user);
+            entityManager.persist(mergedUser);
+        } catch (Throwable e) {
+            e.printStackTrace();
+            //todo specify what fails
             throw new RegistrationFailedException();
         }
 
-        return registeredUser;
+        return mergedUser;
     }
 
+    @Override
+    public UserModel updateUser(UserModel user) {
+        entityManager.merge(user);
+        entityManager.flush();
+        entityManager.clear();
+        return user;
+    }
+
+    @Override
     public UserModel getUserByTokenId(Long tokenId) throws NoUserFound {
-        Optional<UserModel> user = Optional.empty();
+        Optional<UserModel> user;
 
-        try (Session session = sessionFactory.openSession()) {
-            transaction = session.beginTransaction();
-
+        try {
+            Query query = entityManager.createQuery("FROM UserModel WHERE token.id = :id");
             user = Optional.of(
-                    (UserModel) session.createQuery("FROM user_storage u WHERE u.token.id = " + tokenId).getSingleResult()
+                    (UserModel) query.setParameter("id", tokenId).getSingleResult()
             );
-
-            transaction.commit();
         } catch (Exception e) {
-
-            if (transaction != null) {
-                transaction.rollback();
-            }
             e.printStackTrace();
+            throw new NoUserFound();
         }
         return user.orElseThrow(NoUserFound::new);
     }
